@@ -1,0 +1,31 @@
+﻿@inject IServiceProvider ServiceProvider
+@implements IDisposable
+
+@if(!string.IsNullOrEmpty(Message))
+{
+    <span class="error-message">@(Message)</span>    
+}
+
+
+@code {
+    [CascadingParameter] private EditContext EditContext { get; set; } = default!;
+    [Parameter] public string For { get; set; } = string.Empty;
+    private string? Message = null;
+
+    protected override void OnInitialized()
+    {
+        EditContext.OnValidationStateChanged += OnValidationStateChanged;
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        var messages = EditContext.GetValidationMessages(new FieldIdentifier(EditContext.Model, For));
+        Message = messages.FirstOrDefault();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        EditContext.OnValidationStateChanged -= OnValidationStateChanged;
+    }
+}

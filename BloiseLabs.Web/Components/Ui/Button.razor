@@ -1,0 +1,8 @@
+﻿<button type="submit" class="submit-button w-50">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

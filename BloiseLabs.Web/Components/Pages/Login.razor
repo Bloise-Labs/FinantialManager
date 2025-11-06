@@ -1,3 +1,65 @@
 ﻿@page "/"
+@using BloiseLabs.Web.Components.Ui;
+@using System.ComponentModel.DataAnnotations;
 
-<h1>Hello World teste 4</h1>
+<main class="d-flex flex-column justify-content-center align-items-center container h-100 gap-2">
+    <h1>Bloise Labs</h1>
+    <EditForm
+        OnValidSubmit="OnSubmit"
+        EditContext="_editContext"
+        FormName="LoginForm" 
+        class="d-flex flex-column gap-3 w-25" 
+    >
+        <DataAnnotationsValidator />
+        <label class="d-flex flex-column gap-2 @GetLabelFor("Email")">
+            Email: 
+            <InputText type="email" class="input-group-text" @bind-Value="Model.Email"></InputText>
+        </label>
+        <ErrorMessage For="Email" />
+        <label class="d-flex flex-column gap-2 @GetLabelFor("Password")">
+            Password:
+            <InputText type="password" class="input-group-text" @bind-Value="Model.Password"></InputText>
+        </label>
+        <ErrorMessage For="Password" />
+        <div class="mt-2 d-flex justify-content-center align-items-stretch">
+            <Button>
+                Login
+            </Button>
+        </div>
+    </EditForm>
+</main>
+
+@code {
+    public class LoginModel
+    {
+        [Required]
+        [EmailAddress]
+        public string? Email { get; set; }
+        [Required]
+        public string? Password { get; set; }
+    }
+
+    private EditContext _editContext;
+
+    [SupplyParameterFromForm]
+    public LoginModel Model { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _editContext = new EditContext(Model);
+        _editContext.OnValidationStateChanged += (_, _) => StateHasChanged();
+    }
+
+    private string GetLabelFor(string field)
+    {
+        FieldIdentifier fieldId = _editContext.Field(nameof(Model.Email));
+        return _editContext.GetValidationMessages(fieldId).Any() ? "error-message" : "";
+    }
+
+    public void OnSubmit()
+    {
+        Console.WriteLine("Hello World");
+    }
+}
